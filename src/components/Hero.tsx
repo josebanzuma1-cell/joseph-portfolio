@@ -79,14 +79,33 @@ function buildSubjectMask(img: HTMLImageElement): string {
     if (y < H - 1) push(x, y + 1);
   }
 
-  // Subject = anything the flood didn't reach
+  // Second pass: enclosed backdrop pockets (e.g. gaps between arms and
+  // torso, or between chair legs) are unreachable by the border flood.
+  // Mark them as background too, but only under a much tighter color
+  // threshold so skin tones on a brown backdrop are never eaten.
+  const T2tight = 22 * 22;
+  const isBgTight = (i: number) => {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    for (const ref of refs) {
+      const d =
+        (r - ref[0]) * (r - ref[0]) +
+        (g - ref[1]) * (g - ref[1]) +
+        (b - ref[2]) * (b - ref[2]);
+      if (d < T2tight) return true;
+    }
+    return false;
+  };
+
+  // Subject = anything the flood didn't reach and that isn't a tight
+  // backdrop match
   const out = ctx.createImageData(W, H);
   for (let p = 0; p < W * H; p++) {
     const o = p * 4;
+    const isBg = bg[p] || isBgTight(p * 4);
     out.data[o] = 255;
     out.data[o + 1] = 255;
     out.data[o + 2] = 255;
-    out.data[o + 3] = bg[p] ? 0 : 255;
+    out.data[o + 3] = isBg ? 0 : 255;
   }
   ctx.putImageData(out, 0, 0);
 
