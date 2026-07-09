@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
+import { AnimatedFall } from "@/components/ui/block-text";
 import { process } from "../data";
 
 export default function Process() {
@@ -10,9 +11,11 @@ export default function Process() {
       <div className="container-x relative">
         <Reveal>
           <p className="label-caps text-yellow mb-4">Fourth Stop</p>
-          <h2 className="font-serif font-medium text-5xl md:text-6xl mb-4">
-            Your Content Machine Starts Here
-          </h2>
+          <AnimatedFall color="#ffd23f" className="mb-4">
+            <h2 className="font-serif font-medium text-5xl md:text-6xl">
+              Your Content Machine Starts Here
+            </h2>
+          </AnimatedFall>
           <p className="text-dim-on-navy text-lg max-w-xl mb-14">
             A simple system that takes a project from first conversation to
             compounding growth.

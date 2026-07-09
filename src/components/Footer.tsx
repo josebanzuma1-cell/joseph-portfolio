@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Reveal from "./Reveal";
+import { AnimatedFall } from "@/components/ui/block-text";
 import { stops, socials } from "../data";
 import { FaInstagram, FaLinkedin, FaYoutube, FaXTwitter, FaBehance } from "react-icons/fa6";
 
@@ -28,9 +29,11 @@ export default function Footer() {
         <Reveal>
           <div className="glass-navy rounded-2xl max-w-3xl mx-auto text-center px-6 py-12 md:px-14">
             <p className="label-caps text-yellow mb-4">Content Corner</p>
-            <h2 className="font-serif font-medium text-4xl md:text-5xl mb-5">
-              One email a month. Real tools, real workflows, zero hype.
-            </h2>
+            <AnimatedFall color="#ffd23f" className="mb-5">
+              <h2 className="font-serif font-medium text-4xl md:text-5xl">
+                One email a month. Real tools, real workflows, zero hype.
+              </h2>
+            </AnimatedFall>
             <p className="text-dim-on-navy text-lg mb-10">
               Practical web &amp; content tips for founders and creators —
               straight from the projects I'm building.

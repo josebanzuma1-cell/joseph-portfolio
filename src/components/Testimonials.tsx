@@ -1,5 +1,6 @@
 import { Quote } from "lucide-react";
 import Reveal from "./Reveal";
+import { AnimatedFall } from "@/components/ui/block-text";
 import { testimonials } from "../data";
 
 export default function Testimonials() {
@@ -7,9 +8,11 @@ export default function Testimonials() {
     <div className="mb-20">
       <Reveal>
         <p className="label-caps text-dim-on-cream mb-4">Kind Words</p>
-        <h2 className="font-serif font-medium text-4xl md:text-5xl mb-12 text-navy">
-          Trusted by founders who needed it done right
-        </h2>
+        <AnimatedFall color="#182342" className="mb-12">
+          <h2 className="font-serif font-medium text-4xl md:text-5xl text-navy">
+            Trusted by founders who needed it done right
+          </h2>
+        </AnimatedFall>
       </Reveal>
 
       <div className="grid md:grid-cols-3 gap-5">

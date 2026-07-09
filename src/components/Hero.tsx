@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { AnimatedFall } from "@/components/ui/block-text";
 
 export default function Hero() {
   return (
@@ -18,16 +19,18 @@ export default function Hero() {
 
       <div className="container-x relative z-10 pb-32 md:pb-40">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-serif font-medium text-cream leading-[0.95] text-[clamp(4rem,11vw,9rem)]"
-          >
-            Call
-            <br />
-            Joseph
-          </motion.h1>
+          <AnimatedFall color="#ffd23f" delay={1.6}>
+            <motion.h1
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+              className="font-serif font-medium text-cream leading-[0.95] text-[clamp(4rem,11vw,9rem)]"
+            >
+              Call
+              <br />
+              Joseph
+            </motion.h1>
+          </AnimatedFall>
 
           <div className="flex flex-col items-start md:items-end gap-8 md:pb-6">
             <motion.p

@@ -19,9 +19,12 @@ interface BlockTextProps {
  * Reusable Fall Animation Component
  * Converts children text into words that "fall" away as color boxes on scroll.
  */
+// Blocks hold over the words for a beat before falling (seconds)
+const DEFAULT_HOLD = 1.2;
+
 export const AnimatedFall: React.FC<BlockTextProps> = ({
   children,
-  delay = 0,
+  delay = DEFAULT_HOLD,
   color = "#ededed",
   className = "",
 }) => {

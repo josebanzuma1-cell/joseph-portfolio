@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
+import { AnimatedFall } from "@/components/ui/block-text";
 import { services } from "../data";
 
 export default function Services() {
@@ -10,7 +11,9 @@ export default function Services() {
       <div className="container-x relative">
         <Reveal>
           <p className="label-caps text-dim-on-cream mb-4">Third Stop</p>
-          <h2 className="font-serif font-medium text-5xl md:text-6xl mb-14">What I Do</h2>
+          <AnimatedFall color="#182342" className="mb-14">
+            <h2 className="font-serif font-medium text-5xl md:text-6xl">What I Do</h2>
+          </AnimatedFall>
         </Reveal>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
