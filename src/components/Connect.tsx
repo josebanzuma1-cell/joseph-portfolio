@@ -2,6 +2,7 @@ import { useState } from "react";
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
 import Testimonials from "./Testimonials";
+import { AnimatedFall } from "@/components/ui/block-text";
 
 const CONTACT_EMAIL = "hello@josephbuilds.com";
 
@@ -23,9 +24,11 @@ export default function Connect() {
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
           <Reveal>
             <p className="label-caps text-dim-on-cream mb-4">Fifth Stop</p>
-            <h2 className="font-serif font-medium text-5xl md:text-6xl mb-5">
-              Work With Joseph
-            </h2>
+            <AnimatedFall color="#182342" className="mb-5">
+              <h2 className="font-serif font-medium text-5xl md:text-6xl">
+                Work With Joseph
+              </h2>
+            </AnimatedFall>
             <p className="text-navy/80 text-lg leading-relaxed max-w-md mb-8">
               Website builds, content systems, consulting, and social media
               management — tell me what you're working on and let's make it

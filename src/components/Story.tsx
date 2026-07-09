@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
+import { AnimatedFall } from "@/components/ui/block-text";
 import { socials } from "../data";
 import portrait from "../assets/joseph-portrait.png";
 import { FaInstagram, FaLinkedin, FaYoutube, FaXTwitter, FaBehance } from "react-icons/fa6";
@@ -18,7 +19,9 @@ export default function Story() {
       <div className="container-x">
         <Reveal>
           <p className="label-caps text-dim-on-cream mb-4">First Stop</p>
-          <h2 className="font-serif font-medium text-5xl md:text-6xl mb-14">This Is Joseph</h2>
+          <AnimatedFall color="#182342" className="mb-14">
+            <h2 className="font-serif font-medium text-5xl md:text-6xl">This Is Joseph</h2>
+          </AnimatedFall>
         </Reveal>
 
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">

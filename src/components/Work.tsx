@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
+import { AnimatedFall } from "@/components/ui/block-text";
 import { work } from "../data";
 
 export default function Work() {
@@ -8,7 +9,9 @@ export default function Work() {
       <div className="container-x">
         <Reveal>
           <p className="label-caps text-yellow mb-4">Second Stop</p>
-          <h2 className="font-serif font-medium text-5xl md:text-6xl mb-4">Selected Work</h2>
+          <AnimatedFall color="#ffd23f" className="mb-4">
+            <h2 className="font-serif font-medium text-5xl md:text-6xl">Selected Work</h2>
+          </AnimatedFall>
           <p className="text-dim-on-navy text-lg max-w-xl mb-14">
             Web design, development, e-commerce, and content-led social
             growth for founders and small teams.
