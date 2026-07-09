@@ -5,132 +5,58 @@ import heroImg from "../assets/hero-joseph.png";
 
 const SCRUB_SENSITIVITY = 0.8;
 
+// Where the head sits inside the hero photo, in image-normalized
+// coordinates (0..1). Tuned for the black-suit chair portrait.
+const HEAD = {
+  cx: 0.512, // head center, x
+  top: 0.02, // just above the hair
+  bottom: 0.3, // neck / collar line, where the TV "sits"
+};
+const TV_ASPECT = 1.3; // classic 4:3-ish CRT, slightly wide
+
+type Box = { left: number; top: number; width: number; height: number };
+
 /**
- * Builds a black/transparent mask of the photo's subject by flood-filling
- * the (fairly uniform) studio backdrop inward from the image borders.
- * Everything the flood can't reach is the subject — returned as opaque
- * white so it can be used as a CSS mask for the video layer.
+ * The photo renders with object-fit: cover, so to pin the TV to the head
+ * we re-derive the cover transform (uniform scale + centering offsets)
+ * and convert the head's image-space box into container pixels.
  */
-function buildSubjectMask(img: HTMLImageElement): string {
-  const W = 420;
-  const H = Math.round((img.naturalHeight / img.naturalWidth) * W);
-  const cv = document.createElement("canvas");
-  cv.width = W;
-  cv.height = H;
-  const ctx = cv.getContext("2d", { willReadFrequently: true })!;
-  ctx.drawImage(img, 0, 0, W, H);
-  const { data } = ctx.getImageData(0, 0, W, H);
+function computeTvBox(
+  container: HTMLElement,
+  natW: number,
+  natH: number
+): Box {
+  const cw = container.clientWidth;
+  const ch = container.clientHeight;
+  const scale = Math.max(cw / natW, ch / natH);
+  const offX = (cw - natW * scale) / 2;
+  const offY = (ch - natH * scale) / 2;
 
-  // Sample backdrop reference colors along all four borders (the studio
-  // backdrop vignettes, so one average color is not enough)
-  const refs: number[][] = [];
-  const step = Math.max(4, Math.floor(W / 40));
-  const addRef = (x: number, y: number) => {
-    const i = (y * W + x) * 4;
-    refs.push([data[i], data[i + 1], data[i + 2]]);
-  };
-  for (let x = 0; x < W; x += step) {
-    addRef(x, 0);
-    addRef(x, H - 1);
-  }
-  for (let y = 0; y < H; y += step) {
-    addRef(0, y);
-    addRef(W - 1, y);
-  }
-
-  const T2 = 40 * 40;
-  const isBgLike = (i: number) => {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    for (const ref of refs) {
-      const d =
-        (r - ref[0]) * (r - ref[0]) +
-        (g - ref[1]) * (g - ref[1]) +
-        (b - ref[2]) * (b - ref[2]);
-      if (d < T2) return true;
-    }
-    return false;
-  };
-
-  // Flood fill from the borders through backdrop-like pixels only
-  const bg = new Uint8Array(W * H);
-  const stack: number[] = [];
-  const push = (x: number, y: number) => {
-    const p = y * W + x;
-    if (!bg[p] && isBgLike(p * 4)) {
-      bg[p] = 1;
-      stack.push(p);
-    }
-  };
-  for (let x = 0; x < W; x++) {
-    push(x, 0);
-    push(x, H - 1);
-  }
-  for (let y = 0; y < H; y++) {
-    push(0, y);
-    push(W - 1, y);
-  }
-  while (stack.length) {
-    const p = stack.pop()!;
-    const x = p % W;
-    const y = (p / W) | 0;
-    if (x > 0) push(x - 1, y);
-    if (x < W - 1) push(x + 1, y);
-    if (y > 0) push(x, y - 1);
-    if (y < H - 1) push(x, y + 1);
-  }
-
-  // Second pass: enclosed backdrop pockets (e.g. gaps between arms and
-  // torso, or between chair legs) are unreachable by the border flood.
-  // Mark them as background too, but only under a much tighter color
-  // threshold so skin tones on a brown backdrop are never eaten.
-  const T2tight = 22 * 22;
-  const isBgTight = (i: number) => {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    for (const ref of refs) {
-      const d =
-        (r - ref[0]) * (r - ref[0]) +
-        (g - ref[1]) * (g - ref[1]) +
-        (b - ref[2]) * (b - ref[2]);
-      if (d < T2tight) return true;
-    }
-    return false;
-  };
-
-  // Subject = anything the flood didn't reach and that isn't a tight
-  // backdrop match
-  const out = ctx.createImageData(W, H);
-  for (let p = 0; p < W * H; p++) {
-    const o = p * 4;
-    const isBg = bg[p] || isBgTight(p * 4);
-    out.data[o] = 255;
-    out.data[o + 1] = 255;
-    out.data[o + 2] = 255;
-    out.data[o + 3] = isBg ? 0 : 255;
-  }
-  ctx.putImageData(out, 0, 0);
-
-  // Feather the silhouette edge slightly
-  const soft = document.createElement("canvas");
-  soft.width = W;
-  soft.height = H;
-  const sctx = soft.getContext("2d")!;
-  sctx.filter = "blur(1.5px)";
-  sctx.drawImage(cv, 0, 0);
-  return soft.toDataURL();
+  const height = (HEAD.bottom - HEAD.top) * natH * scale;
+  const width = height * TV_ASPECT;
+  const left = HEAD.cx * natW * scale + offX - width / 2;
+  const top = HEAD.top * natH * scale + offY;
+  return { left, top, width, height };
 }
 
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [maskUrl, setMaskUrl] = useState<string | null>(null);
+  const [tvBox, setTvBox] = useState<Box | null>(null);
 
-  // Build the subject mask once the hero photo is decoded
+  // Keep the TV pinned to the head across resizes
   useEffect(() => {
     const img = new Image();
     img.src = heroImg;
-    img
-      .decode()
-      .then(() => setMaskUrl(buildSubjectMask(img)))
-      .catch(() => setMaskUrl(null));
+
+    const update = () => {
+      if (!sectionRef.current || !img.naturalWidth) return;
+      setTvBox(computeTvBox(sectionRef.current, img.naturalWidth, img.naturalHeight));
+    };
+
+    img.decode().then(update).catch(() => {});
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   // Mouse-scrub: horizontal movement seeks the video forward/backward
@@ -152,8 +78,7 @@ export default function Hero() {
       seekTo(targetTime);
     };
 
-    // Queue the next seek if the target moved while we were seeking,
-    // preventing seek-flooding
+    // Queue the next seek if the target moved while seeking (no flooding)
     const onSeeked = () => {
       seeking = false;
       if (Math.abs(video.currentTime - targetTime) > 0.05) seekTo(targetTime);
@@ -182,47 +107,78 @@ export default function Hero() {
       video.removeEventListener("seeked", onSeeked);
       window.removeEventListener("mousemove", onMove);
     };
-  }, [maskUrl]);
+  }, [tvBox]);
 
   return (
-    <section id="top" className="relative min-h-svh flex flex-col justify-end overflow-hidden">
+    <section
+      ref={sectionRef}
+      id="top"
+      className="relative min-h-svh flex flex-col justify-end overflow-hidden"
+    >
       {/* Studio portrait backdrop */}
       <img
         src={heroImg}
-        alt="Joseph seated in a studio portrait; his silhouette plays an analog TV video that scrubs with mouse movement"
+        alt="Joseph seated in a suit with an analog TV over his head; the TV scrubs with mouse movement"
         className="absolute inset-0 w-full h-full object-cover object-center"
       />
 
-      {/* Analog TV video revealed only inside the subject's silhouette.
-          Same cover/center geometry as the photo so the mask stays aligned. */}
-      {maskUrl && (
+      {/* Analog TV replacing the head */}
+      {tvBox && (
         <div
-          className="absolute inset-0"
+          className="absolute z-[5]"
           style={{
-            WebkitMaskImage: `url(${maskUrl})`,
-            maskImage: `url(${maskUrl})`,
-            WebkitMaskSize: "cover",
-            maskSize: "cover",
-            WebkitMaskPosition: "center",
-            maskPosition: "center",
-            WebkitMaskRepeat: "no-repeat",
-            maskRepeat: "no-repeat",
+            left: tvBox.left,
+            top: tvBox.top,
+            width: tvBox.width,
+            height: tvBox.height,
           }}
         >
-          <video
-            ref={videoRef}
-            src="/hero-tv.mp4"
-            muted
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover object-center"
-          />
+          {/* Antennas */}
+          <div className="absolute left-1/2 -top-[34%] h-[36%] w-[2.5%] min-w-[3px] origin-bottom -rotate-[24deg] rounded-full bg-neutral-800">
+            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-neutral-700" />
+          </div>
+          <div className="absolute left-1/2 -top-[34%] h-[36%] w-[2.5%] min-w-[3px] origin-bottom rotate-[24deg] rounded-full bg-neutral-800">
+            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-neutral-700" />
+          </div>
+
+          {/* Bezel */}
+          <div className="absolute inset-0 rounded-[14%] bg-gradient-to-b from-neutral-800 via-neutral-900 to-black shadow-[0_18px_50px_rgba(0,0,0,0.6)] p-[4.5%]">
+            {/* CRT screen */}
+            <div className="relative w-full h-full rounded-[11%] overflow-hidden bg-black">
+              <video
+                ref={videoRef}
+                src="/hero-tv.mp4"
+                muted
+                playsInline
+                preload="auto"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {/* Scanlines */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-35 mix-blend-multiply"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(0deg, rgba(0,0,0,0.55) 0px, rgba(0,0,0,0.55) 1px, transparent 2px, transparent 4px)",
+                }}
+              />
+              {/* CRT vignette + curvature shading */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  boxShadow: "inset 0 0 6vmin rgba(0,0,0,0.85)",
+                  borderRadius: "inherit",
+                }}
+              />
+              {/* Glass glare */}
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/15 via-transparent to-transparent" />
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Legibility gradients over both layers */}
-      <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/95 via-navy-deep/25 to-navy-deep/15 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/45 via-transparent to-navy-deep/35 pointer-events-none" />
+      {/* Legibility gradients */}
+      <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/95 via-navy-deep/20 to-navy-deep/10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/40 via-transparent to-navy-deep/30 pointer-events-none" />
 
       <div className="container-x relative z-10 pb-32 md:pb-40">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
@@ -267,7 +223,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 1.4 }}
           className="label-caps text-cream/70 mt-10 hidden md:block"
         >
-          Move your mouse left / right — the TV inside the silhouette rewinds &amp; plays
+          Move your mouse left / right — the TV rewinds &amp; plays
         </motion.p>
       </div>
     </section>
