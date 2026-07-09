@@ -21,10 +21,12 @@ export default function Footer() {
   };
 
   return (
-    <footer id="corner" className="bg-navy-deep text-cream">
-      <div className="container-x py-24">
+    <footer id="corner" className="relative overflow-hidden bg-navy-deep text-cream">
+      <div className="absolute top-[-10%] left-[15%] w-[460px] h-[460px] rounded-full bg-yellow/12 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[5%] w-[420px] h-[420px] rounded-full bg-navy-soft/60 blur-3xl pointer-events-none" />
+      <div className="container-x py-24 relative">
         <Reveal>
-          <div className="max-w-2xl mx-auto text-center">
+          <div className="glass-navy rounded-2xl max-w-3xl mx-auto text-center px-6 py-12 md:px-14">
             <p className="label-caps text-yellow mb-4">Content Corner</p>
             <h2 className="font-serif font-medium text-4xl md:text-5xl mb-5">
               One email a month. Real tools, real workflows, zero hype.

@@ -15,7 +15,7 @@ export default function Testimonials() {
       <div className="grid md:grid-cols-3 gap-5">
         {testimonials.map((t, i) => (
           <Reveal key={t.name} delay={i * 0.08}>
-            <div className="rounded-xl border border-cream-line bg-cream-soft/60 p-8 h-full flex flex-col">
+            <div className="glass-cream rounded-xl p-8 h-full flex flex-col hover:-translate-y-1 transition-transform duration-300">
               <Quote className="text-navy/30 mb-5" size={24} />
               <p className="font-serif italic text-xl text-navy leading-relaxed flex-1">
                 "{t.quote}"

@@ -5,8 +5,10 @@ import { work } from "../data";
 
 export default function Work() {
   return (
-    <section id="work" className="bg-navy text-cream py-24 md:py-32">
-      <div className="container-x">
+    <section id="work" className="relative overflow-hidden bg-navy text-cream py-24 md:py-32">
+      <div className="absolute -top-24 right-[5%] w-[460px] h-[460px] rounded-full bg-yellow/15 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-18%] left-[-8%] w-[440px] h-[440px] rounded-full bg-navy-soft/70 blur-3xl pointer-events-none" />
+      <div className="container-x relative">
         <Reveal>
           <p className="label-caps text-yellow mb-4">Second Stop</p>
           <AnimatedFall color="#ffd23f" className="mb-4">
@@ -21,8 +23,11 @@ export default function Work() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {work.map((item, i) => (
             <Reveal key={item.title} delay={i * 0.05}>
-              <a href="#connect" className="group block">
-                <div className="relative rounded-lg overflow-hidden border border-navy-line">
+              <a
+                href="#connect"
+                className="group block glass-navy rounded-xl p-4 hover:-translate-y-1 transition-transform duration-300"
+              >
+                <div className="relative rounded-lg overflow-hidden">
                   <img
                     src={item.image}
                     alt={`Placeholder for ${item.title} — swap for your project screenshot`}
@@ -36,7 +41,7 @@ export default function Work() {
                 <h3 className="font-serif text-2xl mt-4 group-hover:text-yellow transition-colors">
                   {item.title}
                 </h3>
-                <p className="label-caps text-dim-on-navy mt-1.5">{item.category}</p>
+                <p className="label-caps text-dim-on-navy mt-1.5 pb-1">{item.category}</p>
               </a>
             </Reveal>
           ))}

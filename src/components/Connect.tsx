@@ -17,8 +17,10 @@ export default function Connect() {
   };
 
   return (
-    <section id="connect" className="bg-cream text-navy py-24 md:py-32">
-      <div className="container-x">
+    <section id="connect" className="relative overflow-hidden bg-cream text-navy py-24 md:py-32">
+      <div className="absolute top-[10%] left-[-8%] w-[440px] h-[440px] rounded-full bg-yellow/30 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-12%] right-[-10%] w-[480px] h-[480px] rounded-full bg-navy/12 blur-3xl pointer-events-none" />
+      <div className="container-x relative">
         <Testimonials />
 
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
@@ -47,7 +49,7 @@ export default function Connect() {
           <Reveal delay={0.1}>
             <form
               onSubmit={handleSubmit}
-              className="rounded-xl border border-cream-line bg-cream-soft/60 p-8 space-y-4"
+              className="glass-cream rounded-xl p-8 space-y-4"
             >
               <div className="grid sm:grid-cols-2 gap-4">
                 <input

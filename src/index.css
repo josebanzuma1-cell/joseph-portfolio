@@ -102,6 +102,23 @@ body {
   box-shadow: 0 10px 32px rgba(255, 210, 63, 0.4);
 }
 
+/* Glassmorphism cards */
+.glass-cream {
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(24, 35, 66, 0.14);
+  box-shadow: 0 8px 32px rgba(24, 35, 66, 0.1);
+}
+
+.glass-navy {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(244, 239, 227, 0.16);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+}
+
 /* Cream CTA pill (hero) */
 .cream-pill {
   background: var(--color-cream);

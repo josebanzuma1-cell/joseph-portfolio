@@ -69,8 +69,12 @@ export default function Rail() {
         style={{ height: `${progress * 100}%` }}
       />
 
+      {/* Left edge sits half a badge left of the line: the collapsed circle is
+          centered on the rail, and the expanded label grows rightward so long
+          section names (e.g. Content Corner) never clip off-screen. */}
       <motion.div
-        className="absolute left-1/2 -translate-x-1/2"
+        className="absolute left-1/2"
+        style={{ x: -BADGE_H / 2 }}
         animate={{ top: `calc(${progress} * (100vh - ${BADGE_H}px))` }}
         transition={{ type: "tween", duration: 0.15, ease: "linear" }}
       >
