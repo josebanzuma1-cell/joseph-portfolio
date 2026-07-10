@@ -34,7 +34,10 @@ function computeGeometry(
   const ch = container.clientHeight;
   const s = cover ? Math.max(cw / natW, ch / natH) : Math.min(cw / natW, ch / natH);
   const offX = (cw - natW * s) / 2;
-  const offY = (ch - natH * s) / 2;
+  // Anchor top on cover (desktop) so the computer head is never cropped;
+  // bias 30% from the top on contain (phones) so the portrait sits clear
+  // of the hero text. Must match the img's object-position classes.
+  const offY = cover ? 0 : (ch - natH * s) * 0.3;
 
   const scrW = SCREEN.w * natW * s;
   const scrH = scrW / SCREEN.aspect;
@@ -242,7 +245,7 @@ export default function Hero() {
       <img
         src={heroImg}
         alt="Joseph in a suit with a vintage desktop computer for a head; its pixel eyes follow your cursor"
-        className="absolute inset-0 w-full h-full object-contain md:object-cover object-center"
+        className="absolute inset-0 w-full h-full object-contain md:object-cover object-[50%_30%] md:object-[50%_0%]"
       />
 
       {/* Movable monitor: a feathered crop of the same photo that tilts
