@@ -10,7 +10,9 @@ const MD_QUERY = "(min-width: 768px)"; // Tailwind md — image switches contain
 // MON is the crop box around the beige monitor (with padding so the tilting
 // copy always covers the baked-in original). SCREEN is the dark CRT glass.
 const MON = { left: 0.415, top: 0.02, width: 0.255, height: 0.33 };
-const SCREEN = { cx: 0.521, cy: 0.158, w: 0.126, aspect: 1.3, rotDeg: 11 };
+// Measured from the photo's dark-glass pixels (centroid + edge line fits),
+// with a hair of inset so the glass edge vignette stays visible.
+const SCREEN = { cx: 0.5194, cy: 0.1622, w: 0.121, aspect: 1.45, rotDeg: 12.5 };
 
 type Geometry = {
   mon: { left: number; top: number; width: number; height: number };
@@ -82,17 +84,17 @@ function drawEyes(
   const eyeH = 11;
 
   for (const e of eyes) {
-    // Eye socket (dim phosphor green)
-    ctx.fillStyle = "#0d2a12";
+    // Eye socket (dim amber, matching the rail's phosphor)
+    ctx.fillStyle = "#33290e";
     ctx.fillRect(e.cx - Math.floor(eyeW / 2), e.cy - Math.floor(eyeH / 2), eyeW, eyeH);
 
     // Pupil: blocky, offset toward the cursor, dilating with speed
     const pr = 1 + Math.round(dilate); // pupil "radius" in cells
     const px = e.cx + Math.round(look.x * 2.5) - pr;
     const py = e.cy + Math.round(look.y * 3) - pr;
-    ctx.fillStyle = "#7dff5e";
+    ctx.fillStyle = "#ffd23f"; // rail yellow
     ctx.fillRect(px, py, pr * 2 + 1, pr * 2 + 1);
-    ctx.fillStyle = "#d6ffca";
+    ctx.fillStyle = "#ffedb0";
     ctx.fillRect(px + pr, py + pr, 1, 1); // hot core pixel
 
     // Eyelid: draw background back over the eye from the top
@@ -130,11 +132,15 @@ export default function Hero() {
       );
     };
 
-    img.decode().then(update).catch(() => {});
+    // decode() can reject sporadically even when the image is usable;
+    // fall through to update() either way, and also listen for load.
+    img.decode().then(update).catch(update);
+    img.addEventListener("load", update);
     const ro = new ResizeObserver(update);
     if (sectionRef.current) ro.observe(sectionRef.current);
     mq.addEventListener("change", update);
     return () => {
+      img.removeEventListener("load", update);
       ro.disconnect();
       mq.removeEventListener("change", update);
     };
@@ -280,7 +286,7 @@ export default function Hero() {
               width: geo.screen.width,
               height: geo.screen.height,
               transform: `rotate(${SCREEN.rotDeg}deg)`,
-              boxShadow: "0 0 24px rgba(125,255,94,0.14)",
+              boxShadow: "0 0 24px rgba(255,210,63,0.15)",
             }}
           >
             {/* Digital pixel eyes */}
