@@ -73,35 +73,35 @@ function drawEyes(
   dilate: number,
   blink: number // 0 open .. 1 closed
 ) {
-  ctx.fillStyle = "#040704";
-  ctx.fillRect(0, 0, GRID_W, GRID_H);
+  // Transparent canvas: the photo's real CRT glass is the screen — we only
+  // paint the glowing pixels, so there is no rectangle edge to mismatch.
+  ctx.clearRect(0, 0, GRID_W, GRID_H);
 
   const eyes = [
     { cx: 14, cy: 16 },
     { cx: 30, cy: 16 },
   ];
-  const eyeW = 9;
   const eyeH = 11;
 
   for (const e of eyes) {
-    // Eye socket (dim amber, matching the rail's phosphor)
-    ctx.fillStyle = "#33290e";
-    ctx.fillRect(e.cx - Math.floor(eyeW / 2), e.cy - Math.floor(eyeH / 2), eyeW, eyeH);
-
     // Pupil: blocky, offset toward the cursor, dilating with speed
     const pr = 1 + Math.round(dilate); // pupil "radius" in cells
     const px = e.cx + Math.round(look.x * 2.5) - pr;
     const py = e.cy + Math.round(look.y * 3) - pr;
-    ctx.fillStyle = "#ffd23f"; // rail yellow
-    ctx.fillRect(px, py, pr * 2 + 1, pr * 2 + 1);
-    ctx.fillStyle = "#ffedb0";
-    ctx.fillRect(px + pr, py + pr, 1, 1); // hot core pixel
+    const size = pr * 2 + 1;
 
-    // Eyelid: draw background back over the eye from the top
-    if (blink > 0) {
-      const lid = Math.round(blink * eyeH);
-      ctx.fillStyle = "#040704";
-      ctx.fillRect(e.cx - Math.floor(eyeW / 2), e.cy - Math.floor(eyeH / 2), eyeW, lid);
+    // Eyelid: blinking clips the pupil from the top instead of painting
+    // a lid, keeping everything outside the pupil transparent
+    const lidY = e.cy - Math.floor(eyeH / 2) + blink * eyeH;
+    const visTop = Math.max(py, Math.ceil(lidY));
+    const visH = py + size - visTop;
+    if (visH <= 0) continue;
+
+    ctx.fillStyle = "#ffd23f"; // rail yellow
+    ctx.fillRect(px, visTop, size, visH);
+    if (py + pr >= visTop) {
+      ctx.fillStyle = "#ffedb0";
+      ctx.fillRect(px + pr, py + pr, 1, 1); // hot core pixel
     }
   }
 }
@@ -277,39 +277,27 @@ export default function Hero() {
               "radial-gradient(ellipse closest-side at 50% 46%, black 68%, transparent 96%)",
           }}
         >
-          {/* CRT glass, matched to the screen's tilt in the photo */}
+          {/* Pixel eyes drawn on a transparent canvas over the photo's own
+              CRT glass — the real screen provides the black, so nothing
+              can misalign with the bezel */}
           <div
-            className="absolute overflow-hidden rounded-[10%] bg-[#040704]"
+            className="absolute"
             style={{
               left: geo.screen.left,
               top: geo.screen.top,
               width: geo.screen.width,
               height: geo.screen.height,
               transform: `rotate(${SCREEN.rotDeg}deg)`,
-              boxShadow: "0 0 24px rgba(255,210,63,0.15)",
             }}
           >
-            {/* Digital pixel eyes */}
             <canvas
               ref={canvasRef}
               className="absolute inset-0 w-full h-full"
-              style={{ imageRendering: "pixelated" }}
-            />
-            {/* Scanlines */}
-            <div
-              className="absolute inset-0 pointer-events-none opacity-30 mix-blend-multiply"
               style={{
-                backgroundImage:
-                  "repeating-linear-gradient(0deg, rgba(0,0,0,0.5) 0px, rgba(0,0,0,0.5) 1px, transparent 2px, transparent 4px)",
+                imageRendering: "pixelated",
+                filter: "drop-shadow(0 0 6px rgba(255,210,63,0.55))",
               }}
             />
-            {/* Tube vignette */}
-            <div
-              className="absolute inset-0 pointer-events-none rounded-[inherit]"
-              style={{ boxShadow: "inset 0 0 4vmin rgba(0,0,0,0.8)" }}
-            />
-            {/* Glass glare */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/10 via-transparent to-transparent" />
           </div>
         </motion.div>
       )}
