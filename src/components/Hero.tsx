@@ -314,17 +314,15 @@ export default function Hero() {
 
       <div className="container-x relative z-10 pb-32 md:pb-40">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+          {/* No motion wrapper here: SplitText rewrites the inner DOM, which
+              orphans any framer-motion-animated child and leaves it stuck at
+              its initial style. The falling blocks are the entrance. */}
           <AnimatedFall color="#ffd23f" delay={1.6}>
-            <motion.h1
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-              className="font-serif font-medium text-cream leading-[0.95] text-[clamp(3.4rem,11vw,9rem)]"
-            >
+            <h1 className="font-serif font-medium text-cream leading-[0.95] text-[clamp(3.4rem,11vw,9rem)]">
               Call
               <br />
               Joseph
-            </motion.h1>
+            </h1>
           </AnimatedFall>
 
           <div className="flex flex-col items-start md:items-end gap-8 md:pb-6">
