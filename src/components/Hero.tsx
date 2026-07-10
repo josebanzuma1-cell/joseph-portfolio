@@ -1,57 +1,76 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { AnimatedFall } from "@/components/ui/block-text";
 import heroImg from "../assets/hero-joseph.png";
 
 const SCRUB_SENSITIVITY = 0.8;
+const MAX_TILT_DEG = 3;
 
-// Where the head sits inside the hero photo, in image-normalized
-// coordinates (0..1). Tuned for the black-suit chair portrait.
-const HEAD = {
-  cx: 0.512, // head center, x
-  top: 0.02, // just above the hair
-  bottom: 0.3, // neck / collar line, where the TV "sits"
+// Image-normalized (0..1) geometry, measured on the computer-head portrait.
+// MON is the crop box around the beige monitor (with padding so the tilting
+// copy always covers the baked-in original). SCREEN is the dark CRT glass.
+const MON = { left: 0.415, top: 0.02, width: 0.255, height: 0.33 };
+const SCREEN = { cx: 0.52, cy: 0.16, w: 0.132, aspect: 1.3, rotDeg: 11 };
+
+type Geometry = {
+  mon: { left: number; top: number; width: number; height: number };
+  bgSize: string;
+  bgPos: string;
+  screen: { left: number; top: number; width: number; height: number };
 };
-const TV_ASPECT = 1.3; // classic 4:3-ish CRT, slightly wide
-
-type Box = { left: number; top: number; width: number; height: number };
 
 /**
- * The photo renders with object-fit: cover, so to pin the TV to the head
- * we re-derive the cover transform (uniform scale + centering offsets)
- * and convert the head's image-space box into container pixels.
+ * The photo renders with object-fit: cover. Re-derive that transform
+ * (uniform scale + centering offsets) to place the monitor crop and the
+ * CRT screen in container pixels.
  */
-function computeTvBox(
-  container: HTMLElement,
-  natW: number,
-  natH: number
-): Box {
+function computeGeometry(container: HTMLElement, natW: number, natH: number): Geometry {
   const cw = container.clientWidth;
   const ch = container.clientHeight;
-  const scale = Math.max(cw / natW, ch / natH);
-  const offX = (cw - natW * scale) / 2;
-  const offY = (ch - natH * scale) / 2;
+  const s = Math.max(cw / natW, ch / natH);
+  const offX = (cw - natW * s) / 2;
+  const offY = (ch - natH * s) / 2;
 
-  const height = (HEAD.bottom - HEAD.top) * natH * scale;
-  const width = height * TV_ASPECT;
-  const left = HEAD.cx * natW * scale + offX - width / 2;
-  const top = HEAD.top * natH * scale + offY;
-  return { left, top, width, height };
+  const monLeft = MON.left * natW * s + offX;
+  const monTop = MON.top * natH * s + offY;
+  const monW = MON.width * natW * s;
+  const monH = MON.height * natH * s;
+
+  const scrW = SCREEN.w * natW * s;
+  const scrH = scrW / SCREEN.aspect;
+
+  return {
+    mon: { left: monLeft, top: monTop, width: monW, height: monH },
+    // The crop shows the same photo, shifted so only the monitor is visible
+    bgSize: `${natW * s}px ${natH * s}px`,
+    bgPos: `${-(MON.left * natW * s)}px ${-(MON.top * natH * s)}px`,
+    screen: {
+      left: (SCREEN.cx - MON.left) * natW * s - scrW / 2,
+      top: (SCREEN.cy - MON.top) * natH * s - scrH / 2,
+      width: scrW,
+      height: scrH,
+    },
+  };
 }
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [tvBox, setTvBox] = useState<Box | null>(null);
+  const [geo, setGeo] = useState<Geometry | null>(null);
+  const [progress, setProgress] = useState(0);
 
-  // Keep the TV pinned to the head across resizes
+  // The monitor is "movable": it tilts a few degrees toward the cursor,
+  // pivoting at its bottom edge so it stays planted on the neck.
+  const tilt = useMotionValue(0);
+  const smoothTilt = useSpring(tilt, { stiffness: 120, damping: 16 });
+
   useEffect(() => {
     const img = new Image();
     img.src = heroImg;
 
     const update = () => {
       if (!sectionRef.current || !img.naturalWidth) return;
-      setTvBox(computeTvBox(sectionRef.current, img.naturalWidth, img.naturalHeight));
+      setGeo(computeGeometry(sectionRef.current, img.naturalWidth, img.naturalHeight));
     };
 
     img.decode().then(update).catch(() => {});
@@ -59,7 +78,7 @@ export default function Hero() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Mouse-scrub: horizontal movement seeks the video forward/backward
+  // Mouse-scrub + tilt, per the interaction spec
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -84,7 +103,12 @@ export default function Hero() {
       if (Math.abs(video.currentTime - targetTime) > 0.05) seekTo(targetTime);
     };
 
+    const onTime = () => {
+      if (video.duration) setProgress(video.currentTime / video.duration);
+    };
+
     const onMove = (e: MouseEvent) => {
+      tilt.set(((e.clientX / window.innerWidth) - 0.5) * 2 * MAX_TILT_DEG);
       if (prevX === null) {
         prevX = e.clientX;
         return;
@@ -101,79 +125,90 @@ export default function Hero() {
 
     video.addEventListener("loadedmetadata", onLoaded);
     video.addEventListener("seeked", onSeeked);
+    video.addEventListener("timeupdate", onTime);
     window.addEventListener("mousemove", onMove);
     return () => {
       video.removeEventListener("loadedmetadata", onLoaded);
       video.removeEventListener("seeked", onSeeked);
+      video.removeEventListener("timeupdate", onTime);
       window.removeEventListener("mousemove", onMove);
     };
-  }, [tvBox]);
+  }, [geo, tilt]);
 
   return (
     <section
       ref={sectionRef}
       id="top"
-      className="relative min-h-svh flex flex-col justify-end overflow-hidden"
+      className="relative min-h-svh flex flex-col justify-end overflow-hidden cursor-ew-resize"
     >
-      {/* Studio portrait backdrop */}
+      {/* Studio portrait backdrop (monitor already in the shot) */}
       <img
         src={heroImg}
-        alt="Joseph seated in a suit with an analog TV over his head; the TV scrubs with mouse movement"
+        alt="Joseph in a suit with a vintage desktop computer for a head; its screen plays a video that scrubs with mouse movement"
         className="absolute inset-0 w-full h-full object-cover object-center"
       />
 
-      {/* Analog TV replacing the head */}
-      {tvBox && (
-        <div
+      {/* Movable monitor: a crop of the same photo that tilts with the
+          cursor, pivoting at the neck. The CRT video lives inside it. */}
+      {geo && (
+        <motion.div
           className="absolute z-[5]"
           style={{
-            left: tvBox.left,
-            top: tvBox.top,
-            width: tvBox.width,
-            height: tvBox.height,
+            left: geo.mon.left,
+            top: geo.mon.top,
+            width: geo.mon.width,
+            height: geo.mon.height,
+            rotate: smoothTilt,
+            transformOrigin: "50% 92%",
+            backgroundImage: `url(${heroImg})`,
+            backgroundSize: geo.bgSize,
+            backgroundPosition: geo.bgPos,
+            backgroundRepeat: "no-repeat",
           }}
         >
-          {/* Antennas */}
-          <div className="absolute left-1/2 -top-[34%] h-[36%] w-[2.5%] min-w-[3px] origin-bottom -rotate-[24deg] rounded-full bg-neutral-800">
-            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-neutral-700" />
-          </div>
-          <div className="absolute left-1/2 -top-[34%] h-[36%] w-[2.5%] min-w-[3px] origin-bottom rotate-[24deg] rounded-full bg-neutral-800">
-            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-neutral-700" />
-          </div>
-
-          {/* Bezel */}
-          <div className="absolute inset-0 rounded-[14%] bg-gradient-to-b from-neutral-800 via-neutral-900 to-black shadow-[0_18px_50px_rgba(0,0,0,0.6)] p-[4.5%]">
-            {/* CRT screen */}
-            <div className="relative w-full h-full rounded-[11%] overflow-hidden bg-black">
-              <video
-                ref={videoRef}
-                src="/hero-tv.mp4"
-                muted
-                playsInline
-                preload="auto"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              {/* Scanlines */}
+          {/* CRT glass, matched to the screen's tilt in the photo */}
+          <div
+            className="absolute overflow-hidden rounded-[8%] bg-black"
+            style={{
+              left: geo.screen.left,
+              top: geo.screen.top,
+              width: geo.screen.width,
+              height: geo.screen.height,
+              transform: `rotate(${SCREEN.rotDeg}deg)`,
+            }}
+          >
+            <video
+              ref={videoRef}
+              src="/hero-tv.mp4"
+              muted
+              playsInline
+              preload="auto"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* Scanlines */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-30 mix-blend-multiply"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(0deg, rgba(0,0,0,0.5) 0px, rgba(0,0,0,0.5) 1px, transparent 2px, transparent 4px)",
+              }}
+            />
+            {/* Tube vignette */}
+            <div
+              className="absolute inset-0 pointer-events-none rounded-[inherit]"
+              style={{ boxShadow: "inset 0 0 4vmin rgba(0,0,0,0.8)" }}
+            />
+            {/* Glass glare */}
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/12 via-transparent to-transparent" />
+            {/* Scrub progress line */}
+            <div className="absolute left-[8%] right-[8%] bottom-[6%] h-[3px] bg-white/15 rounded-full overflow-hidden">
               <div
-                className="absolute inset-0 pointer-events-none opacity-35 mix-blend-multiply"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(0deg, rgba(0,0,0,0.55) 0px, rgba(0,0,0,0.55) 1px, transparent 2px, transparent 4px)",
-                }}
+                className="h-full bg-yellow rounded-full"
+                style={{ width: `${progress * 100}%` }}
               />
-              {/* CRT vignette + curvature shading */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  boxShadow: "inset 0 0 6vmin rgba(0,0,0,0.85)",
-                  borderRadius: "inherit",
-                }}
-              />
-              {/* Glass glare */}
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/15 via-transparent to-transparent" />
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Legibility gradients */}
@@ -210,7 +245,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
               href="#connect"
-              className="cream-pill"
+              className="cream-pill cursor-pointer"
             >
               Work With Me
             </motion.a>
@@ -223,7 +258,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 1.4 }}
           className="label-caps text-cream/70 mt-10 hidden md:block"
         >
-          Move your mouse left / right — the TV rewinds &amp; plays
+          Move your mouse left / right — the screen rewinds &amp; plays
         </motion.p>
       </div>
     </section>
