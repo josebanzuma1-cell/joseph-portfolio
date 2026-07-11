@@ -4,7 +4,6 @@ import { AnimatedFall } from "@/components/ui/block-text";
 import heroImg from "../assets/hero-joseph.png";
 
 const MAX_TILT_DEG = 2.5;
-const MD_QUERY = "(min-width: 768px)"; // Tailwind md — image switches contain -> cover here
 
 // Image-normalized (0..1) geometry, measured on the computer-head portrait.
 // MON is the crop box around the beige monitor (with padding so the tilting
@@ -15,6 +14,7 @@ const MON = { left: 0.415, top: 0.02, width: 0.255, height: 0.33 };
 const SCREEN = { cx: 0.5194, cy: 0.1622, w: 0.121, aspect: 1.45, rotDeg: 12.5 };
 
 type Geometry = {
+  imgPos: string;
   mon: { left: number; top: number; width: number; height: number };
   bgSize: string;
   bgPos: string;
@@ -22,29 +22,26 @@ type Geometry = {
 };
 
 /**
- * Mirror the CSS object-fit math (cover on md+, contain below) so the
- * monitor overlay lands exactly on the photographed monitor at any
- * viewport size — desktop and phone alike.
+ * The photo always fills the hero (object-fit: cover), anchored to the top
+ * and panned horizontally so the computer head stays centered — on phones
+ * the tall viewport crops the photo's sides, never the monitor. The same
+ * offsets drive the img's object-position and the overlay, keeping the
+ * eyes registered with the glass at any size.
  */
-function computeGeometry(
-  container: HTMLElement,
-  natW: number,
-  natH: number,
-  cover: boolean
-): Geometry {
+function computeGeometry(container: HTMLElement, natW: number, natH: number): Geometry {
   const cw = container.clientWidth;
   const ch = container.clientHeight;
-  const s = cover ? Math.max(cw / natW, ch / natH) : Math.min(cw / natW, ch / natH);
-  const offX = (cw - natW * s) / 2;
-  // Anchor top on cover (desktop) so the computer head is never cropped;
-  // bias 30% from the top on contain (phones) so the portrait sits clear
-  // of the hero text. Must match the img's object-position classes.
-  const offY = cover ? 0 : (ch - natH * s) * 0.3;
+  const s = Math.max(cw / natW, ch / natH);
+  // Pan so the screen center sits mid-viewport, clamped to the image bounds
+  const minOffX = Math.min(0, cw - natW * s);
+  const offX = Math.max(minOffX, Math.min(0, cw / 2 - SCREEN.cx * natW * s));
+  const offY = 0; // top-anchored: the computer head keeps its headroom
 
   const scrW = SCREEN.w * natW * s;
   const scrH = scrW / SCREEN.aspect;
 
   return {
+    imgPos: `${offX}px ${offY}px`,
     mon: {
       left: MON.left * natW * s + offX,
       top: MON.top * natH * s + offY,
@@ -119,17 +116,14 @@ export default function Hero() {
   const tilt = useMotionValue(0);
   const smoothTilt = useSpring(tilt, { stiffness: 120, damping: 16 });
 
-  // Geometry: recompute on any section resize and on the md breakpoint flip
+  // Geometry: recompute on any section resize
   useEffect(() => {
     const img = new Image();
     img.src = heroImg;
-    const mq = window.matchMedia(MD_QUERY);
 
     const update = () => {
       if (!sectionRef.current || !img.naturalWidth) return;
-      setGeo(
-        computeGeometry(sectionRef.current, img.naturalWidth, img.naturalHeight, mq.matches)
-      );
+      setGeo(computeGeometry(sectionRef.current, img.naturalWidth, img.naturalHeight));
     };
 
     // decode() can reject sporadically even when the image is usable;
@@ -138,11 +132,9 @@ export default function Hero() {
     img.addEventListener("load", update);
     const ro = new ResizeObserver(update);
     if (sectionRef.current) ro.observe(sectionRef.current);
-    mq.addEventListener("change", update);
     return () => {
       img.removeEventListener("load", update);
       ro.disconnect();
-      mq.removeEventListener("change", update);
     };
   }, []);
 
@@ -237,21 +229,14 @@ export default function Hero() {
       id="top"
       className="relative min-h-svh flex flex-col justify-end overflow-hidden bg-[#5e3517]"
     >
-      {/* Backdrop-matched wash behind the contain-fit on phones */}
-      <div
-        className="absolute inset-0 md:hidden"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 70% at 50% 42%, #8a5326 0%, #6b3d1a 55%, #4a2810 100%)",
-        }}
-      />
-
-      {/* Studio portrait: cover on desktop, contain on phones so the
-          computer head is always fully in frame */}
+      {/* Studio portrait: always fills the hero, top-anchored and panned
+          so the computer head stays centered — on phones the sides crop,
+          never the monitor */}
       <img
         src={heroImg}
         alt="Joseph in a suit with a vintage desktop computer for a head; its pixel eyes follow your cursor"
-        className="absolute inset-0 w-full h-full object-contain md:object-cover object-[50%_30%] md:object-[50%_0%]"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectPosition: geo ? geo.imgPos : "50% 0%" }}
       />
 
       {/* Movable monitor: a feathered crop of the same photo that tilts
