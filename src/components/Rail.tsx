@@ -61,7 +61,10 @@ export default function Rail() {
 
   return (
     <div className="fixed left-5 lg:left-10 top-0 bottom-0 z-40">
-      <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[2px] lg:w-[3px] bg-yellow/90 pointer-events-none" />
+      <div
+        className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[2px] lg:w-[3px] bg-yellow/90 pointer-events-none"
+        style={{ boxShadow: "0 0 0 1px rgba(255,255,255,0.85)" }}
+      />
 
       {/* Passed-track tint */}
       <div
@@ -80,7 +83,7 @@ export default function Rail() {
       >
         <motion.div
           layout
-          className="h-9 rounded-full bg-yellow text-navy-deep flex items-center justify-center font-bold shadow-lg overflow-hidden whitespace-nowrap"
+          className="h-9 rounded-full bg-yellow text-navy-deep flex items-center justify-center font-bold shadow-lg overflow-hidden whitespace-nowrap ring-2 ring-white/90"
           style={{ minWidth: BADGE_H }}
           transition={{ type: "spring", stiffness: 320, damping: 28 }}
         >

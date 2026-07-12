@@ -35,15 +35,19 @@ export default function Work() {
                     src={item.image}
                     alt={`Live screenshot of ${item.title} — an award-winning reference site`}
                     className="w-full aspect-[10/7] object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    loading="lazy"
+                    loading="eager"
                   />
-                  <span className="absolute top-3 left-3 inline-flex items-center rounded-full bg-navy-deep/80 backdrop-blur-sm border border-dashed border-cream/50 px-2.5 py-1 text-[9px] uppercase tracking-widest text-cream">
-                    Reference · swap with your work
-                  </span>
                 </div>
-                <h3 className="font-serif text-2xl mt-4 group-hover:text-yellow transition-colors">
-                  {item.title}
-                </h3>
+                <div className="flex items-center gap-3 mt-4">
+                  <img
+                    src={`https://icons.duckduckgo.com/ip3/${new URL(item.url).hostname}.ico`}
+                    alt=""
+                    className="w-8 h-8 rounded-md bg-cream/10 p-1 object-contain shrink-0"
+                  />
+                  <h3 className="font-serif text-2xl group-hover:text-yellow transition-colors">
+                    {item.title}
+                  </h3>
+                </div>
                 <p className="label-caps text-dim-on-navy mt-1.5 pb-1">{item.category}</p>
               </a>
             </Reveal>
