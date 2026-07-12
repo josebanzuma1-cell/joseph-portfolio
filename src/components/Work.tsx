@@ -15,8 +15,9 @@ export default function Work() {
             <h2 className="font-serif font-medium text-5xl md:text-6xl">Selected Work</h2>
           </AnimatedFall>
           <p className="text-dim-on-navy text-lg max-w-xl mb-14">
-            Web design, development, e-commerce, and content-led social
-            growth for founders and small teams.
+            A curated shelf of award-winning builds I study and benchmark
+            against — the bar every project I take on aims for. (Swap in
+            your own client work before pitching.)
           </p>
         </Reveal>
 
@@ -24,18 +25,20 @@ export default function Work() {
           {work.map((item, i) => (
             <Reveal key={item.title} delay={i * 0.05}>
               <a
-                href="#connect"
+                href={item.url}
+                target="_blank"
+                rel="noreferrer"
                 className="group block glass-navy rounded-xl p-4 hover:-translate-y-1 transition-transform duration-300"
               >
                 <div className="relative rounded-lg overflow-hidden">
                   <img
                     src={item.image}
-                    alt={`Placeholder for ${item.title} — swap for your project screenshot`}
+                    alt={`Live screenshot of ${item.title} — an award-winning reference site`}
                     className="w-full aspect-[10/7] object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     loading="lazy"
                   />
                   <span className="absolute top-3 left-3 inline-flex items-center rounded-full bg-navy-deep/80 backdrop-blur-sm border border-dashed border-cream/50 px-2.5 py-1 text-[9px] uppercase tracking-widest text-cream">
-                    Swap for your project
+                    Reference · swap with your work
                   </span>
                 </div>
                 <h3 className="font-serif text-2xl mt-4 group-hover:text-yellow transition-colors">

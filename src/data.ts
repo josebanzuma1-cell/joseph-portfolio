@@ -40,13 +40,18 @@ export const services = [
   },
 ];
 
+// Live screenshots of each site via the free thum.io service
+const shot = (url: string) => `https://image.thum.io/get/width/800/crop/600/${url}`;
+
+// Curated award-winning references — swap these with your own client
+// projects before pitching; they are benchmarks, not Joseph's builds.
 export const work = [
-  { title: "Northline Studio", category: "Web Design · Development", image: "https://picsum.photos/seed/northline/800/560" },
-  { title: "Arcadia Retail", category: "E-commerce · Shopify", image: "https://picsum.photos/seed/arcadia/800/560" },
-  { title: "Pulse Fitness App", category: "Product Design · Web App", image: "https://picsum.photos/seed/pulse/800/560" },
-  { title: "Havenwood Realty", category: "Branding · Web", image: "https://picsum.photos/seed/havenwood/800/560" },
-  { title: "Kindred Collective", category: "Social Strategy · Content", image: "https://picsum.photos/seed/kindred/800/560" },
-  { title: "Ferro Coffee Co.", category: "Web Design · Content", image: "https://picsum.photos/seed/ferro/800/560" },
+  { title: "Igloo Inc", category: "Awwwards Site of the Year · WebGL", url: "https://igloo.inc", image: shot("https://igloo.inc") },
+  { title: "Lusion", category: "Creative Studio · Multi-Award Winner", url: "https://lusion.co", image: shot("https://lusion.co") },
+  { title: "Active Theory", category: "Interactive · FWA & Webby Winner", url: "https://activetheory.net", image: shot("https://activetheory.net") },
+  { title: "Locomotive", category: "Agency Site · Awwwards Winner", url: "https://locomotive.ca", image: shot("https://locomotive.ca") },
+  { title: "Obys Agency", category: "Typography-Led · Awwwards Winner", url: "https://obys.agency", image: shot("https://obys.agency") },
+  { title: "Linear", category: "Product Site Benchmark", url: "https://linear.app", image: shot("https://linear.app") },
 ];
 
 export const process = [
@@ -56,23 +61,24 @@ export const process = [
   { n: "04", title: "Grow", desc: "Ongoing content, management, and optimization that compounds over time." },
 ];
 
+// Placeholder quotes — replace with real client words before launch
 export const testimonials = [
   {
     quote: "Joseph rebuilt our site and our social presence in the same month. Traffic and inquiries both doubled within a quarter.",
     name: "Amara Reyes",
-    role: "Founder, Northline Studio",
+    role: "Startup Founder",
     avatar: "https://i.pravatar.cc/120?img=47",
   },
   {
     quote: "The rare combination of a developer who designs, writes, and actually understands how content drives growth.",
     name: "David Kwan",
-    role: "Marketing Lead, Arcadia Retail",
+    role: "Marketing Lead",
     avatar: "https://i.pravatar.cc/120?img=12",
   },
   {
     quote: "Consistent, reliable, and sharp with strategy. Joseph is now our go-to for anything web or content related.",
     name: "Priya Nair",
-    role: "Owner, Ferro Coffee Co.",
+    role: "Small Business Owner",
     avatar: "https://i.pravatar.cc/120?img=32",
   },
 ];
