@@ -31,7 +31,7 @@ export default function Footer() {
         src={cornerBg}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover object-[80%_25%] opacity-50 pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover object-[80%_25%] opacity-70 pointer-events-none select-none"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-navy-deep via-navy-deep/75 to-navy-deep/40 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-transparent to-navy-deep/60 pointer-events-none" />

@@ -21,7 +21,7 @@ export default function Connect() {
     <section id="connect" className="relative overflow-hidden bg-cream text-navy py-24 md:py-32">
       <div className="absolute top-[10%] left-[-8%] w-[440px] h-[440px] rounded-full bg-yellow/30 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-12%] right-[-10%] w-[480px] h-[480px] rounded-full bg-navy/12 blur-3xl pointer-events-none" />
-      <SectionGlow />
+      <SectionGlow tone="navy" />
       <div className="container-x relative">
         <Testimonials />
 

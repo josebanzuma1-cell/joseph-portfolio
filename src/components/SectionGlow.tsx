@@ -50,13 +50,29 @@ function ensureTracker() {
   requestAnimationFrame(loop);
 }
 
-export default function SectionGlow() {
+// Amber light for the dark navy sections; deep navy light for the cream
+// sections (matching the Work section's background family)
+const TONES = {
+  amber: {
+    core: "rgba(255, 196, 64, 0.16)",
+    halo: "rgba(255, 176, 36, 0.1)",
+    haloMid: "rgba(255, 160, 20, 0.04)",
+  },
+  navy: {
+    core: "rgba(24, 35, 66, 0.14)",
+    halo: "rgba(24, 35, 66, 0.09)",
+    haloMid: "rgba(17, 26, 51, 0.04)",
+  },
+} as const;
+
+export default function SectionGlow({ tone = "amber" }: { tone?: keyof typeof TONES }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     ensureTracker();
     const el = ref.current;
     if (!el) return;
+    const c = TONES[tone];
 
     const paint = (x: number, y: number) => {
       // Viewport cursor position -> this section's local coordinates
@@ -64,8 +80,8 @@ export default function SectionGlow() {
       const lx = x - r.left;
       const ly = y - r.top;
       el.style.background = `
-        radial-gradient(280px circle at ${lx}px ${ly}px, rgba(255, 196, 64, 0.16), transparent 70%),
-        radial-gradient(640px circle at ${lx}px ${ly}px, rgba(255, 176, 36, 0.1), rgba(255, 160, 20, 0.04) 45%, transparent 72%)
+        radial-gradient(280px circle at ${lx}px ${ly}px, ${c.core}, transparent 70%),
+        radial-gradient(640px circle at ${lx}px ${ly}px, ${c.halo}, ${c.haloMid} 45%, transparent 72%)
       `;
     };
 
@@ -74,7 +90,7 @@ export default function SectionGlow() {
     return () => {
       subscribers.delete(paint);
     };
-  }, []);
+  }, [tone]);
 
   return <div ref={ref} className="absolute inset-0 pointer-events-none" aria-hidden="true" />;
 }

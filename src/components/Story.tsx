@@ -17,7 +17,7 @@ const iconMap: Record<string, React.ReactNode> = {
 export default function Story() {
   return (
     <section id="about" className="relative overflow-hidden bg-cream text-navy py-24 md:py-32">
-      <SectionGlow />
+      <SectionGlow tone="navy" />
       <div className="container-x relative">
         <Reveal>
           <p className="label-caps text-dim-on-cream mb-4">First Stop</p>
