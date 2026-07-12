@@ -11,7 +11,7 @@ const railStops = [
   { id: "corner", label: "Content Corner", initial: "CC" },
 ];
 
-const BADGE_H = 44;
+const BADGE_H = 36;
 
 export default function Rail() {
   const [progress, setProgress] = useState(0);
@@ -60,12 +60,12 @@ export default function Rail() {
   }, []);
 
   return (
-    <div className="hidden lg:block fixed left-10 top-0 bottom-0 z-40">
-      <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[3px] bg-yellow/90 pointer-events-none" />
+    <div className="fixed left-5 lg:left-10 top-0 bottom-0 z-40">
+      <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[2px] lg:w-[3px] bg-yellow/90 pointer-events-none" />
 
       {/* Passed-track tint */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 top-0 w-[3px] bg-navy-deep/30 pointer-events-none"
+        className="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] lg:w-[3px] bg-navy-deep/30 pointer-events-none"
         style={{ height: `${progress * 100}%` }}
       />
 
@@ -80,7 +80,7 @@ export default function Rail() {
       >
         <motion.div
           layout
-          className="h-11 rounded-full bg-yellow text-navy-deep flex items-center justify-center font-bold shadow-lg overflow-hidden whitespace-nowrap"
+          className="h-9 rounded-full bg-yellow text-navy-deep flex items-center justify-center font-bold shadow-lg overflow-hidden whitespace-nowrap"
           style={{ minWidth: BADGE_H }}
           transition={{ type: "spring", stiffness: 320, damping: 28 }}
         >

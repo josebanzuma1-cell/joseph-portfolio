@@ -296,9 +296,9 @@ export default function Hero() {
           {/* No motion wrapper here: SplitText rewrites the inner DOM, which
               orphans any framer-motion-animated child and leaves it stuck at
               its initial style. The falling blocks are the entrance. */}
-          <AnimatedFall color="#ffd23f" delay={1.6}>
+          <AnimatedFall color="#ffd23f" delay={0.8}>
             <h1 className="font-serif font-medium text-cream leading-[0.95] text-[clamp(3.4rem,11vw,9rem)]">
-              Call
+              <span className="text-yellow">Call</span>
               <br />
               Joseph
             </h1>
@@ -311,8 +311,10 @@ export default function Hero() {
               transition={{ duration: 0.9, delay: 0.3 }}
               className="font-serif italic text-2xl md:text-3xl text-cream leading-snug md:text-right max-w-md"
             >
-              The bridge between your brand
-              <br className="hidden md:block" /> and the people it's built for
+              The <span className="text-yellow">bridge</span> between your{" "}
+              <span className="text-yellow">brand</span>
+              <br className="hidden md:block" /> and the <span className="text-yellow">people</span> it's{" "}
+              <span className="text-yellow">built for</span>
             </motion.p>
             <motion.a
               initial={{ opacity: 0, y: 16 }}
