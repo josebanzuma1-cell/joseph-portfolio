@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
+import SectionGlow from "./SectionGlow";
 import { AnimatedFall } from "@/components/ui/block-text";
 import { socials } from "../data";
 import portrait from "../assets/joseph-portrait.png";
@@ -15,8 +16,9 @@ const iconMap: Record<string, React.ReactNode> = {
 
 export default function Story() {
   return (
-    <section id="about" className="bg-cream text-navy py-24 md:py-32">
-      <div className="container-x">
+    <section id="about" className="relative overflow-hidden bg-cream text-navy py-24 md:py-32">
+      <SectionGlow />
+      <div className="container-x relative">
         <Reveal>
           <p className="label-caps text-dim-on-cream mb-4">First Stop</p>
           <AnimatedFall color="#182342" className="mb-14">

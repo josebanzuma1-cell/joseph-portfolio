@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
+import SectionGlow from "./SectionGlow";
 import { AnimatedFall } from "@/components/ui/block-text";
 import { services } from "../data";
 import servicesBg from "../assets/services-bg.png";
@@ -14,11 +15,12 @@ export default function Services() {
         src={servicesBg}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover object-[75%_20%] opacity-25 mix-blend-multiply pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover object-[75%_20%] opacity-50 mix-blend-multiply pointer-events-none select-none"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-cream via-cream/75 to-cream/25 pointer-events-none" />
       <div className="absolute -top-24 right-[-10%] w-[480px] h-[480px] rounded-full bg-yellow/35 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-15%] left-[-8%] w-[420px] h-[420px] rounded-full bg-navy/15 blur-3xl pointer-events-none" />
+      <SectionGlow />
       <div className="container-x relative">
         <Reveal>
           <p className="label-caps text-dim-on-cream mb-4">Third Stop</p>

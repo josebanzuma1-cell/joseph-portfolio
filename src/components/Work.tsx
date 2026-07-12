@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import NextStop from "./NextStop";
+import SectionGlow from "./SectionGlow";
 import { AnimatedFall } from "@/components/ui/block-text";
 import { work } from "../data";
 
@@ -8,6 +9,7 @@ export default function Work() {
     <section id="work" className="relative overflow-hidden bg-navy text-cream py-24 md:py-32">
       <div className="absolute -top-24 right-[5%] w-[460px] h-[460px] rounded-full bg-yellow/15 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-18%] left-[-8%] w-[440px] h-[440px] rounded-full bg-navy-soft/70 blur-3xl pointer-events-none" />
+      <SectionGlow />
       <div className="container-x relative">
         <Reveal>
           <p className="label-caps text-yellow mb-4">Second Stop</p>

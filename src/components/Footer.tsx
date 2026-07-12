@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Reveal from "./Reveal";
+import SectionGlow from "./SectionGlow";
 import { AnimatedFall } from "@/components/ui/block-text";
 import { stops, socials } from "../data";
 import cornerBg from "../assets/corner-bg.png";
@@ -30,12 +31,13 @@ export default function Footer() {
         src={cornerBg}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover object-[80%_25%] opacity-20 pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover object-[80%_25%] opacity-50 pointer-events-none select-none"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-navy-deep via-navy-deep/75 to-navy-deep/40 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-transparent to-navy-deep/60 pointer-events-none" />
       <div className="absolute top-[-10%] left-[15%] w-[460px] h-[460px] rounded-full bg-yellow/12 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[5%] w-[420px] h-[420px] rounded-full bg-navy-soft/60 blur-3xl pointer-events-none" />
+      <SectionGlow />
       <div className="container-x py-24 relative">
         <Reveal>
           <div className="glass-navy rounded-2xl max-w-3xl mx-auto text-center px-6 py-12 md:px-14">
