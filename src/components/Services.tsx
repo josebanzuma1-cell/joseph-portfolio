@@ -2,10 +2,21 @@ import Reveal from "./Reveal";
 import NextStop from "./NextStop";
 import { AnimatedFall } from "@/components/ui/block-text";
 import { services } from "../data";
+import servicesBg from "../assets/services-bg.png";
 
 export default function Services() {
   return (
     <section id="services" className="relative overflow-hidden bg-cream text-navy py-24 md:py-32">
+      {/* Portrait backdrop, multiplied into the cream at low opacity; the
+          cream gradient keeps the left text/cards zone clean while the
+          subject ghosts through on the right */}
+      <img
+        src={servicesBg}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover object-[75%_20%] opacity-25 mix-blend-multiply pointer-events-none select-none"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-cream via-cream/75 to-cream/25 pointer-events-none" />
       <div className="absolute -top-24 right-[-10%] w-[480px] h-[480px] rounded-full bg-yellow/35 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-15%] left-[-8%] w-[420px] h-[420px] rounded-full bg-navy/15 blur-3xl pointer-events-none" />
       <div className="container-x relative">
