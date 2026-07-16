@@ -47,6 +47,40 @@ body {
   }
 }
 
+/* Wider column for the hero only: a fluid marketing statement should keep
+   using more of the canvas on large monitors instead of sitting inside the
+   same 1180px reading column as the paragraph sections. */
+.container-hero {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+@media (min-width: 768px) {
+  .container-hero {
+    padding-inline: 48px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-hero {
+    max-width: 1440px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container-hero {
+    max-width: 1720px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .container-hero {
+    max-width: 2000px;
+  }
+}
+
 /* Letterspaced uppercase label */
 .label-caps {
   font-family: var(--font-sans);
@@ -133,4 +167,18 @@ body {
 }
 .cream-pill:hover {
   transform: translateY(-2px);
+}
+
+@media (min-width: 1920px) {
+  .cream-pill {
+    font-size: 17px;
+    padding: 20px 40px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .cream-pill {
+    font-size: 19px;
+    padding: 22px 44px;
+  }
 }

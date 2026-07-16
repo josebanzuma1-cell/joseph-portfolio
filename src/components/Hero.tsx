@@ -291,13 +291,13 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/95 via-navy-deep/20 to-navy-deep/10 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/40 via-transparent to-navy-deep/30 pointer-events-none" />
 
-      <div className="container-x relative z-10 pb-32 md:pb-40">
+      <div className="container-hero relative z-10 pb-32 md:pb-40">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
           {/* No motion wrapper here: SplitText rewrites the inner DOM, which
               orphans any framer-motion-animated child and leaves it stuck at
               its initial style. The falling blocks are the entrance. */}
           <AnimatedFall color="#ffd23f" delay={0.8}>
-            <h1 className="font-serif font-medium text-cream leading-[0.95] text-[clamp(3.4rem,11vw,9rem)]">
+            <h1 className="font-serif font-medium text-cream leading-[0.95] text-[3.4rem] sm:text-[4.5rem] md:text-[6rem] lg:text-[7.5rem] xl:text-[9rem] 2xl:text-[10rem] [@media(min-width:1920px)]:text-[11.5rem] [@media(min-width:2560px)]:text-[13rem]">
               <span className="text-yellow">Call</span>
               <br />
               Joseph
@@ -309,7 +309,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.3 }}
-              className="font-serif italic text-2xl md:text-3xl text-cream leading-snug md:text-right max-w-md"
+              className="font-serif italic text-2xl md:text-3xl 2xl:text-[2.5rem] [@media(min-width:1920px)]:text-[2.75rem] [@media(min-width:2560px)]:text-[3.25rem] text-cream leading-snug md:text-right max-w-md 2xl:max-w-lg [@media(min-width:2560px)]:max-w-xl"
             >
               The <span className="text-yellow">bridge</span> between your{" "}
               <span className="text-yellow">brand</span>
